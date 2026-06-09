@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "doverlay"
+version = "0.1.0"
+description = "Always-on-top overlay showing a Draftout opponent's competitive record"
+requires-python = ">=3.11"
+dependencies = [
+    "requests",
+    "watchdog",
+]
+
+[project.scripts]
+doverlay = "doverlay.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/doverlay"]

@@ -11,10 +11,10 @@ import threading
 import requests
 from watchdog.observers import Observer
 
-from config import DEFAULT_DIR, DEFAULT_IGN
-from overlay import Overlay
-from stats import get_record
-from watcher import OpponentWatcher
+from .config import DEFAULT_DIR, DEFAULT_IGN
+from .overlay import Overlay
+from .stats import get_record
+from .watcher import OpponentWatcher
 
 
 def lookup_async(overlay: Overlay, name: str) -> None:

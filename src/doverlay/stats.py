@@ -3,7 +3,7 @@ from typing import Any, Self
 
 import requests
 
-from config import USER_AGENT
+from .config import USER_AGENT
 
 
 @dataclass

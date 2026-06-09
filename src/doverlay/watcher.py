@@ -29,7 +29,9 @@ class OpponentWatcher(FileSystemEventHandler):
         for line in self._file:
             self._handle(line)
 
-    def on_created(self, event: FileSystemEvent) -> None:  # log rotated out from under us
+    def on_created(
+        self, event: FileSystemEvent
+    ) -> None:  # log rotated out from under us
         if event.src_path == self._path:
             self._file.close()
             self._file = open(self._path, "r", encoding="utf-8", errors="replace")

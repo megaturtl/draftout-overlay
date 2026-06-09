@@ -1,8 +1,8 @@
 import tkinter as tk
 from typing import Callable
 
-from config import BG, FG, DIM, GREEN, RED, DRAW, ENTRY_BG
-from stats import Record
+from .config import BG, FG, DIM, GREEN, RED, DRAW, ENTRY_BG
+from .stats import Record
 
 
 class OverlayView:
