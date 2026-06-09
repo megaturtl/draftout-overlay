@@ -39,8 +39,13 @@ class OverlayView:
         for w in self.stat_labels:
             w.pack(side="left")
 
-        self.ff_lbl = self._label(self.row, DIM, 12)
-        self.ff_lbl.pack(side="left", padx=(12, 0))
+        # --- Forfeit Row (packed only when showing a player with losses) ---
+        self.ff_row = tk.Frame(self.root, bg=BG)
+        self.ff_tag = self._label(self.ff_row, DIM, 11, bold=True)
+        self.ff_tag.config(text="forfeit")
+        self.ff_tag.pack(side="left")
+        self.ff_vals = self._label(self.ff_row, DIM, 11)
+        self.ff_vals.pack(side="left", padx=(8, 0))
 
         # --- Entry ---
         self.entry = tk.Entry(
@@ -60,6 +65,9 @@ class OverlayView:
             self.name_lbl,
             self.elo_lbl,
             self.row,
+            self.ff_row,
+            self.ff_tag,
+            self.ff_vals,
         ]
 
     # -- Widget Factories --
@@ -79,12 +87,25 @@ class OverlayView:
             padx=4,
         )
 
+    # Fixed-width fields so values landing in phase 2 don't reflow the row.
+    @staticmethod
+    def _forfeit_values(rec: Record) -> str:
+        pct = f"{rec.forfeit_pct}%" if rec.forfeit_pct is not None else "--%"
+        avg = rec.avg_forfeit_str or "--:--"
+        deficit = (
+            f"-{rec.avg_forfeit_deficit:.1f}g"
+            if rec.avg_forfeit_deficit is not None
+            else "--.-g"
+        )
+        return f"{pct:>4}   {avg:>5}   {deficit:>6}"
+
     # -- Visual State Toggles --
     def show_waiting(self) -> None:
         self.name_lbl.config(text="Waiting for match...")
         self.elo_lbl.config(text="")
-        for w in self.stat_labels + (self.ff_lbl,):
+        for w in self.stat_labels:
             w.config(text="")
+        self.ff_row.pack_forget()
         self.refresh_btn.pack_forget()
         self.entry.pack(fill="x", padx=10, pady=(0, 8))
 
@@ -98,15 +119,20 @@ class OverlayView:
         self.d_lbl.config(text=str(rec.draws))
         self.sep2.config(text="/")
         self.l_lbl.config(text=str(rec.losses), fg=RED)
-        self.ff_lbl.config(
-            text=f"FF:{rec.forfeit_pct}%" if rec.forfeit_pct is not None else ""
-        )
+        # Only meaningful with losses; visibility is set from phase-1 data so the
+        # row never appears or disappears between the two updates of one lookup.
+        if rec.forfeit_pct is not None:
+            self.ff_vals.config(text=self._forfeit_values(rec))
+            self.ff_row.pack(fill="x", padx=10, pady=(0, 8), after=self.row)
+        else:
+            self.ff_row.pack_forget()
 
     def show_status(self, name: str, message: str) -> None:
         self.entry.pack_forget()
+        self.ff_row.pack_forget()
         self.name_lbl.config(text=name)
         self.elo_lbl.config(text="")
-        for w in self.stat_labels + (self.ff_lbl,):
+        for w in self.stat_labels:
             w.config(text="")
         self.l_lbl.config(text=message, fg=DIM)
 

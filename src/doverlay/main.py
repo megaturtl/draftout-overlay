@@ -11,22 +11,49 @@ import threading
 import requests
 from watchdog.observers import Observer
 
-from .config import DEFAULT_DIR, DEFAULT_IGN
+from . import api, cache, history, stats
+from .config import CACHE_PATH, DEFAULT_DIR, DEFAULT_IGN
 from .overlay import Overlay
-from .stats import get_record
+from .stats import Record
 from .watcher import OpponentWatcher
 
 
 def lookup_async(overlay: Overlay, name: str) -> None:
-    """Fetch and display one player's record on a background thread."""
+    """Look up a player on a background thread.
+
+    Show the headline record from one request first, then discover/cache the
+    full match history and update with the stats that need every match.
+    """
 
     def run() -> None:
         overlay.set_status(name, "looking up...")
         try:
-            overlay.set_player(get_record(name))
+            page1 = api.get_player_page(name)
         except (requests.RequestException, ValueError) as exc:
             overlay.set_status(name, "lookup failed")
             print(f"[lookup] {name}: {exc}")
+            return
+
+        rec = Record.from_api(name, page1)
+        overlay.set_player(rec)
+
+        uuid = (page1.get("player") or {}).get("uuid")
+        if uuid is None:
+            return
+        # Best-effort enrichment: the headline record is already shown, so any
+        # failure here (network, cache/DB locked, bad payload) just skips the
+        # extra stats rather than killing the thread.
+        try:
+            conn = cache.connect(CACHE_PATH)
+            try:
+                summaries = history.discover(conn, name, uuid, first_page=page1)
+            finally:
+                conn.close()
+            rec.avg_forfeit_ms = stats.avg_forfeit_ms(uuid, summaries)
+            rec.avg_forfeit_deficit = stats.avg_forfeit_deficit(uuid, summaries)
+            overlay.set_player(rec)
+        except Exception as exc:
+            print(f"[history] {name}: {exc}")
 
     threading.Thread(target=run, daemon=True).start()
 

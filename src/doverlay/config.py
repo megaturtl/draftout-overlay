@@ -1,9 +1,14 @@
+from pathlib import Path
+
 DEFAULT_DIR = "/home/liam/Sync/minecraft/instances/Draftout/minecraft"
 DEFAULT_IGN = "megaturtl"
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 )
+
+# SQLite cache of discovered match history. Parent dir is created on connect.
+CACHE_PATH = Path.home() / ".local/share/doverlay/cache.db"
 
 BG = "#101418"
 FG = "#e8eef5"
