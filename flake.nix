@@ -10,7 +10,6 @@
     systems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
     forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
 
-    # Runtime dependencies of the package.
     pythonDeps = ps: [ps.requests ps.watchdog ps.tkinter];
   in {
     # `nix build` / installable on NixOS; exposes the `doverlay` command.

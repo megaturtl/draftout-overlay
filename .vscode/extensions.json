@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "mkhl.direnv",
+    "charliermarsh.ruff",
+    "astral-sh.ty"
+  ]
+}

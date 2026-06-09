@@ -17,3 +17,9 @@ doverlay = "doverlay.main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/doverlay"]
+
+[tool.ty.environment]
+# Stable symlink to the flake's Python env prefix, repointed by .envrc on each
+# direnv load. Lets ty resolve third-party imports (requests, watchdog) in the
+# editor without depending on PATH/direnv load ordering.
+python = ".direnv/pyenv"

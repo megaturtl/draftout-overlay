@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import Callable
 
-from .config import BG, FG, DIM, GREEN, RED, DRAW, ENTRY_BG
+from .config import BG, DIM, DRAW, ENTRY_BG, FG, GREEN, RED
 from .stats import Record
 
 
