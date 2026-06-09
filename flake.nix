@@ -12,7 +12,7 @@
 
     pythonDeps = ps: [ps.requests ps.watchdog ps.tkinter];
   in {
-    # `nix build` / installable on NixOS; exposes the `doverlay` command.
+    # `nix build`
     packages = forAllSystems (pkgs: {
       default = pkgs.python3.pkgs.buildPythonApplication {
         pname = "doverlay";
@@ -25,7 +25,7 @@
       };
     });
 
-    # `nix run` launches the overlay.
+    # `nix run` launches the overlay
     apps = forAllSystems (pkgs: {
       default = {
         type = "app";
@@ -33,7 +33,7 @@
       };
     });
 
-    # `nix develop` (or direnv `use flake`) for editing, building, and testing.
+    # `nix develop` (or direnv `use flake`) for editing, building, and testing
     devShells = forAllSystems (pkgs: {
       default = pkgs.mkShell {
         packages = [
